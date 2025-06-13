@@ -2,19 +2,20 @@ import tkinter as tk
 from tkinter import messagebox
 
 class BookingPage(tk.Toplevel):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent, db):
+        super().__init__(parent)
         self.geometry("400x615")
         self.resizable(False, False)
         self.configure(bg='white')
         tk.Label(self, text="Booking Page", fg="#3E23D6", font=('Inter', -32), bg='white').pack(pady=(40, 10))
         fields = ['Name', 'Flight Number', 'Departure', 'Destination', 'Date', 'Seat Number']
 
-        Form(self, fields, 'Book')
+        Form(self, fields, 'Book', db)
     
 class Form(tk.Frame):
-    def __init__(self, parent, fields, btn_text):
+    def __init__(self, parent, fields, btn_text, db):
         super().__init__(parent)
+        self.db = db
         self.parent = parent
         self.configure( width=292, bg='white')
         self.pack_propagate(False)
@@ -39,11 +40,13 @@ class Form(tk.Frame):
         tk.Button(btn_frame, text='Cancel', font=('Inter', -20, "bold"), fg='white', bg="#EC2929", activeforeground='white', activebackground='#EC2929', bd=0, command=self.cancel, width=11).pack(side='right')           
 
     def submit(self):
-        messagebox.showinfo(message='The Operation was successful', parent=self)
+        data = []
         for entry in self.entrys:
-            print(entry.get())
+            data.append(entry.get())
             entry.delete(0, tk.END)
+        self.db.create_reservation(*data)
         self.entrys[0].focus_set()
-    
+        messagebox.showinfo(message='The Operation was successful', parent=self)
+
     def cancel(self):
         self.parent.destroy()

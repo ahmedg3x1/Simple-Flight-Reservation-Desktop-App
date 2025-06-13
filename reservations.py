@@ -2,35 +2,43 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 
+from edit_reservation import EditPage
 
 class ReservationsPage(tk.Toplevel):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent, db):
+        super().__init__(parent)
+        self.db = db
         self.geometry("820x410")
         self.resizable(False, False)
         self.configure(bg='white')
 
         tk.Label(self, text='Your Reservations', fg='#3E23D6', font=('Inter', -32), bg='white').pack(pady=(20, 10))
-
-        data = []
                 
-        columns = [('Flight Number', 100), ('Name', None) , ('Departure', 100), ('Destination', 100), ('Date', 100), ('Seat Number', 100)]
+        columns = [('Name', None), ('Flight Number', 100), ('Departure', 100), ('Destination', 100), ('Date', 100), ('Seat Number', 100)]
         
         self.table = Table(self,columns)
         self.table.pack()
-
-        for entry in data:
-            self.table.insert_entry(entry)
+        self.insert_from_db()
 
         btns = SubmitBtns(self)
         btns.create_btn('Edit', 'white', '#4492F7', 40, self.edit)
         btns.create_btn('Delete', 'white', '#EC2929', 40, self.delete)
         btns.pack(pady=30)
 
+
+    def insert_from_db(self):
+        for entry in self.db.read_reservations():
+            self.table.insert_entry(entry[0], entry[1:])
+            
     def edit(self):
-            sel = self.table.return_selctedItem()
-            if sel:
-                pass
+            id = self.table.return_selctedItem_ID()
+            selected = self.table.return_selctedItem()
+            if selected:
+                editPage = EditPage(self, id, selected, self.db)
+                editPage.grab_set()
+                self.wait_window(editPage)
+                self.table.delete_all()
+                self.insert_from_db()
             else:
                 messagebox.showerror(message='Please select an entry first.', parent=self) 
 
@@ -39,6 +47,7 @@ class ReservationsPage(tk.Toplevel):
         if sel:
             response = messagebox.askyesno(message='Are you sure you want to delete the selected entry?', parent=self)      
             if response:
+                self.db.delete_reservations(self.table.return_selctedItem_ID())
                 self.table.delete_selected_item()
         else:
             messagebox.showerror(message='Please select an entry first.', parent=self)
@@ -68,7 +77,6 @@ class Table(tk.Frame):
         self.tree = ttk.Treeview(self, columns=self.cols, show="headings", selectmode="browse", yscrollcommand=tree_scroll.set)
         tree_scroll.config(command=self.tree.yview)
 
-        
         for col in columns:
             self.tree.column(col[0], width=col[1])
             self.tree.heading(col[0], text=col[0], anchor='w')
@@ -78,18 +86,25 @@ class Table(tk.Frame):
 
         tree_scroll.pack(side='right', fill='y')
         self.tree.pack()
+
+    def return_selctedItem_ID(self):
+        return self.tree.item(self.tree.selection(), 'text') 
     
     def return_selctedItem(self):
-        return self.tree.selection()
+        return self.tree.item(self.tree.selection(), 'values') 
     
     def delete_selected_item(self):
-        self.tree.delete(self.return_selctedItem())
+        self.tree.delete(self.tree.selection())
     
-    def insert_entry(self, entry):
-        self.tree.insert(parent='', index='end', values=entry, tags=self.tag)
+    def insert_entry(self, id, entry):
+        self.tree.insert(parent='', index='end', text=id, values=entry, tags=self.tag)
         self.tag = 'even' if self.tag == 'odd' else 'odd'    
  
-    
+    def delete_all(self):
+        for item in self.tree.get_children():
+            self.tree.delete(item)        
+
+
 class SubmitBtns(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)

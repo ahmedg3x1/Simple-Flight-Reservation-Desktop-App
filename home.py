@@ -1,26 +1,24 @@
 import tkinter as tk
 from PIL import Image, ImageTk
+from booking import BookingPage
+from reservations import ReservationsPage
 
-class HomePage(tk.Tk):
-    def __init__(self, title, bookingPage, reservationsPage):
-        super().__init__()
-        self.title(title)
-        self.geometry("840x420")
-        self.resizable(False, False)
-        self.configure(bg='white')
-        tk.Label(self, text="Welcome to Flight Reservations App", font=('Inter', -32, 'bold'), fg= '#3E23D6', bg='white').pack(pady=30)
+class HomePage:
+    def __init__(self, root, db):
+        self.root = root
+        self.root.geometry("840x420")
+        self.root.resizable(False, False)
+        self.root.configure(bg='white')
+        tk.Label(self.root, text="Welcome to Flight Reservations App", font=('Inter', -32, 'bold'), fg= '#3E23D6', bg='white').pack(pady=30)
         
-        MainFrame(self, bookingPage, reservationsPage)
+        MainFrame(self.root, db)
         
-        self.mainloop()
 
 class MainFrame(tk.Frame):
-        def __init__(self, parent, bookingPage, reservationsPage):
+        def __init__(self, parent, db):
             super().__init__(parent)
-
-            self.bookingPage = bookingPage
-            self.reservationsPage = reservationsPage
-
+            self.parent = parent
+            self.db = db
             self.configure(bg='white')
             # Grid
             self.columnconfigure(0, weight=1)
@@ -35,10 +33,10 @@ class MainFrame(tk.Frame):
 
 
         def book_flight(self):
-            self.bookingPage().grab_set()
+            BookingPage(self.parent, self.db).grab_set()
 
         def view_reservation(self):
-            self.reservationsPage().grab_set()            
+            ReservationsPage(self.parent, self.db).grab_set()            
 
 
 class CardWidget(tk.Frame):

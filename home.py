@@ -1,34 +1,25 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 from booking import BookingPage
-from reservations import ReservationsPage
 
-class HomePage:
-    def __init__(self, root, db):
-        self.root = root
-        self.root.geometry("840x420")
-        self.root.resizable(False, False)
-        self.root.configure(bg='white')
-        tk.Label(self.root, text="Welcome to Flight Reservations App", font=('Inter', -32, 'bold'), fg= '#3E23D6', bg='white').pack(pady=30)
-        
-        MainFrame(self.root, db)
-        
-
-class MainFrame(tk.Frame):
+class HomePage(tk.Frame):
         def __init__(self, parent, db):
             super().__init__(parent)
             self.parent = parent
             self.db = db
             self.configure(bg='white')
-            # Grid
+            tk.Label(self, text="Welcome to Flight Reservations App", font=('Inter', -32, 'bold'), fg= '#3E23D6', bg='white').pack(pady=30)
+
+            cardContiner = tk.Frame(self, bg='white')
             self.columnconfigure(0, weight=1)
             self.columnconfigure(1, weight=1)
 
             text = 'Reserve your next flight by providing your details and flight information.'    
-            CardWidget(self, 0, 0, 'assets/book_flight_img.png', 'Book a Flight', text, 'Book Flight', self.book_flight)
+            CardWidget(cardContiner, 0, 0, 'assets/book_flight_img.png', 'Book a Flight', text, 'Book a Flight', self.book_flight)
 
             text2 = 'Manage your existing reservations, view details, edit or cancel if needed.'    
-            CardWidget(self, 0, 1, 'assets/view_reservations_img.png', 'View Reservations', text2, 'View Reservations', self.view_reservation)
+            CardWidget(cardContiner, 0, 1, 'assets/view_reservations_img.png', 'View Reservations', text2, 'View Reservations', self.view_reservation)
+            cardContiner.pack()
             self.pack()
 
 
@@ -36,8 +27,7 @@ class MainFrame(tk.Frame):
             BookingPage(self.parent, self.db).grab_set()
 
         def view_reservation(self):
-            ReservationsPage(self.parent, self.db).grab_set()            
-
+            self.parent.change_frame('ReservationsPage')
 
 class CardWidget(tk.Frame):
         def __init__(self, parent, row, col, img_path, title, text, btn_txt, btn_fun):
@@ -54,8 +44,6 @@ class CardWidget(tk.Frame):
 
             btn_frame = tk.Frame(self, width=187, height=39)
             btn_frame.pack_propagate(False)
-
             btn = tk.Button(btn_frame, text=btn_txt, font=('Inter', -16, "bold"), fg='white', bg='#4492F7', activeforeground='white', activebackground='#4492F7' , bd=0, command=btn_fun)  
             btn.pack(fill='both', expand=True)
-
             btn_frame.pack(pady=6)

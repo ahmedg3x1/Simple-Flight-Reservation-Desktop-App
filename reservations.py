@@ -1,15 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-
 from edit_reservation import EditPage
 
-class ReservationsPage(tk.Toplevel):
+class ReservationsPage(tk.Frame):
     def __init__(self, parent, db):
         super().__init__(parent)
+        self.parent = parent
         self.db = db
-        self.geometry("820x410")
-        self.resizable(False, False)
         self.configure(bg='white')
 
         tk.Label(self, text='Your Reservations', fg='#3E23D6', font=('Inter', -32), bg='white').pack(pady=(20, 10))
@@ -17,19 +15,26 @@ class ReservationsPage(tk.Toplevel):
         columns = [('Name', None), ('Flight Number', 100), ('Departure', 100), ('Destination', 100), ('Date', 100), ('Seat Number', 100)]
         
         self.table = Table(self,columns)
-        self.table.pack()
         self.insert_from_db()
+
+        self.table.pack()
 
         btns = SubmitBtns(self)
         btns.create_btn('Edit', 'white', '#4492F7', 40, self.edit)
         btns.create_btn('Delete', 'white', '#EC2929', 40, self.delete)
+        btns.create_btn('Go Back', 'white', "#000000", 40, self.goBack)
         btns.pack(pady=30)
 
 
     def insert_from_db(self):
         for entry in self.db.read_reservations():
             self.table.insert_entry(entry[0], entry[1:])
-            
+
+    def reset(self):
+        self.table.delete_all()
+        self.insert_from_db()            
+
+    #btns
     def edit(self):
             id = self.table.return_selctedItem_ID()
             selected = self.table.return_selctedItem()
@@ -37,22 +42,23 @@ class ReservationsPage(tk.Toplevel):
                 editPage = EditPage(self, id, selected, self.db)
                 editPage.grab_set()
                 self.wait_window(editPage)
-                self.table.delete_all()
-                self.insert_from_db()
+                self.reset()
             else:
-                messagebox.showerror(message='Please select an entry first.', parent=self) 
+                messagebox.showerror(message='Please select an entry first.') 
 
     def delete(self):
         sel = self.table.return_selctedItem()
         if sel:
-            response = messagebox.askyesno(message='Are you sure you want to delete the selected entry?', parent=self)      
+            response = messagebox.askyesno(message='Are you sure you want to delete the selected entry?')      
             if response:
                 self.db.delete_reservations(self.table.return_selctedItem_ID())
                 self.table.delete_selected_item()
         else:
-            messagebox.showerror(message='Please select an entry first.', parent=self)
+            messagebox.showerror(message='Please select an entry first.')
 
-  
+    def goBack(self):
+        self.parent.change_frame('HomePage')
+        
 class Table(tk.Frame):
     def __init__(self, parent, columns):
         super().__init__(parent)

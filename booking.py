@@ -7,9 +7,10 @@ class BookingPage(tk.Toplevel):
         self.geometry("400x615")
         self.resizable(False, False)
         self.configure(bg='white')
-        tk.Label(self, text="Booking Page", fg="#3E23D6", font=('Inter', -32), bg='white').pack(pady=(40, 10))
-        fields = ['Name', 'Flight Number', 'Departure', 'Destination', 'Date', 'Seat Number']
 
+        tk.Label(self, text="Booking Page", fg="#3E23D6", font=('Inter', -32), bg='white').pack(pady=(40, 10))
+        
+        fields = ['Name', 'Flight Number', 'Departure', 'Destination', 'Date', 'Seat Number']
         Form(self, fields, 'Book', db)
     
 class Form(tk.Frame):
@@ -17,10 +18,13 @@ class Form(tk.Frame):
         super().__init__(parent)
         self.db = db
         self.parent = parent
+
         self.configure( width=292, bg='white')
         self.pack_propagate(False)
+        
         self.entrys = self.create_fields(fields)
         self.create_submit_btns(btn_text)
+        
         self.pack(fill='y', expand=True)
 
     def create_fields(self, fields):
@@ -37,16 +41,17 @@ class Form(tk.Frame):
         btn_frame.pack_propagate(False)
         btn_frame.pack(pady=20)
         tk.Button(btn_frame, text=btn_text, font=('Inter', -20, "bold"), fg='white', bg='#4492F7', activeforeground='white', activebackground='#4492F7', bd=0, command=self.submit, width=11).pack(side='left')           
-        tk.Button(btn_frame, text='Cancel', font=('Inter', -20, "bold"), fg='white', bg="#EC2929", activeforeground='white', activebackground='#EC2929', bd=0, command=self.cancel, width=11).pack(side='right')           
+        tk.Button(btn_frame, text='Go Back', font=('Inter', -20, "bold"), fg='white', bg="#000000", activeforeground='white', activebackground='#000000', bd=0, command=self.goBack, width=11).pack(side='right')           
 
     def submit(self):
         data = []
         for entry in self.entrys:
             data.append(entry.get())
             entry.delete(0, tk.END)
+        
         self.db.create_reservation(*data)
         self.entrys[0].focus_set()
         messagebox.showinfo(message='The Operation was successful', parent=self)
 
-    def cancel(self):
+    def goBack(self):
         self.parent.destroy()

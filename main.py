@@ -1,3 +1,4 @@
+import os
 import tkinter as tk
 from database import Database
 from home import HomePage
@@ -12,7 +13,7 @@ class App(tk.Tk):
         self.columnconfigure(0, weight=1)
         
         self.title('Flight Reservation Desktop App')
-        icon = tk.PhotoImage(file='assets/App.png')
+        icon = tk.PhotoImage(file=os.path.join(os.path.dirname(__file__), 'assets\\App.png'))
         self.iconphoto(True, icon)
 
         self.frames = {}

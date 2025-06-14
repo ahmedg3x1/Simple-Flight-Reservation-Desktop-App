@@ -16,11 +16,11 @@ class HomePage(tk.Frame):
             self.columnconfigure(1, weight=1)
 
             text = 'Reserve your next flight by providing your details and flight information.'   
-            img1 = os.path.join(os.path.dirname(__file__), 'assets\\book_flight_img.png') 
+            img1 = os.path.join(os.path.dirname(__file__), 'assets', 'book_flight_img.png') 
             CardWidget(cardContiner, 0, 0, img1, 'Book a Flight', text, 'Book a Flight', self.book_flight)
             
             text2 = 'Manage your existing reservations, view details, edit or cancel if needed.'    
-            img2 = os.path.join(os.path.dirname(__file__), 'assets\\view_reservations_img.png') 
+            img2 = os.path.join(os.path.dirname(__file__), 'assets', 'view_reservations_img.png') 
             CardWidget(cardContiner, 0, 1, img2, 'View Reservations', text2, 'View Reservations', self.view_reservation)
             cardContiner.pack()
             self.pack()
